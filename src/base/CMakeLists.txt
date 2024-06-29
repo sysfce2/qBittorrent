@@ -38,6 +38,8 @@ add_library(qbt_base STATIC
     bittorrent/torrent.h
     bittorrent/torrentcontenthandler.h
     bittorrent/torrentcontentlayout.h
+    bittorrent/torrentcontentremoveoption.h
+    bittorrent/torrentcontentremover.h
     bittorrent/torrentcreationmanager.h
     bittorrent/torrentcreationtask.h
     bittorrent/torrentcreator.h
@@ -46,6 +48,7 @@ add_library(qbt_base STATIC
     bittorrent/torrentinfo.h
     bittorrent/tracker.h
     bittorrent/trackerentry.h
+    bittorrent/trackerentrystatus.h
     concepts/explicitlyconvertibleto.h
     concepts/stringable.h
     digest32.h
@@ -106,6 +109,7 @@ add_library(qbt_base STATIC
     utils/io.h
     utils/misc.h
     utils/net.h
+    utils/number.h
     utils/os.h
     utils/password.h
     utils/random.h
@@ -143,6 +147,7 @@ add_library(qbt_base STATIC
     bittorrent/sslparameters.cpp
     bittorrent/torrent.cpp
     bittorrent/torrentcontenthandler.cpp
+    bittorrent/torrentcontentremover.cpp
     bittorrent/torrentcreationmanager.cpp
     bittorrent/torrentcreationtask.cpp
     bittorrent/torrentcreator.cpp
@@ -151,6 +156,7 @@ add_library(qbt_base STATIC
     bittorrent/torrentinfo.cpp
     bittorrent/tracker.cpp
     bittorrent/trackerentry.cpp
+    bittorrent/trackerentrystatus.cpp
     exceptions.cpp
     http/connection.cpp
     http/httperror.cpp
@@ -199,6 +205,7 @@ add_library(qbt_base STATIC
     utils/io.cpp
     utils/misc.cpp
     utils/net.cpp
+    utils/number.cpp
     utils/os.cpp
     utils/password.cpp
     utils/random.cpp

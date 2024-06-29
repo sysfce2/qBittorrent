@@ -26,11 +26,10 @@
  * exception statement from your version.
  */
 
-'use strict';
+"use strict";
 
-if (window.qBittorrent === undefined) {
+if (window.qBittorrent === undefined)
     window.qBittorrent = {};
-}
 
 window.qBittorrent.Misc = (function() {
     const exports = function() {
@@ -71,7 +70,7 @@ window.qBittorrent.Misc = (function() {
             return "QBT_TR(Unknown)QBT_TR[CONTEXT=misc]";
 
         let i = 0;
-        while (value >= 1024.0 && i < 6) {
+        while ((value >= 1024.0) && (i < 6)) {
             value /= 1024.0;
             ++i;
         }
@@ -86,8 +85,9 @@ window.qBittorrent.Misc = (function() {
         }
 
         let ret;
-        if (i === 0)
+        if (i === 0) {
             ret = value + " " + units[i];
+        }
         else {
             const precision = friendlyUnitPrecision(i);
             const offset = Math.pow(10, precision);
@@ -104,7 +104,7 @@ window.qBittorrent.Misc = (function() {
      * JS counterpart of the function in src/misc.cpp
      */
     const friendlyDuration = function(seconds, maxCap = -1) {
-        if (seconds < 0 || ((seconds >= maxCap) && (maxCap >= 0)))
+        if ((seconds < 0) || ((seconds >= maxCap) && (maxCap >= 0)))
             return "∞";
         if (seconds === 0)
             return "0";
@@ -112,18 +112,18 @@ window.qBittorrent.Misc = (function() {
             return "QBT_TR(< 1m)QBT_TR[CONTEXT=misc]";
         let minutes = seconds / 60;
         if (minutes < 60)
-            return "QBT_TR(%1m)QBT_TR[CONTEXT=misc]".replace("%1", parseInt(minutes));
+            return "QBT_TR(%1m)QBT_TR[CONTEXT=misc]".replace("%1", Math.floor(minutes));
         let hours = minutes / 60;
-        minutes = minutes % 60;
+        minutes %= 60;
         if (hours < 24)
-            return "QBT_TR(%1h %2m)QBT_TR[CONTEXT=misc]".replace("%1", parseInt(hours)).replace("%2", parseInt(minutes));
+            return "QBT_TR(%1h %2m)QBT_TR[CONTEXT=misc]".replace("%1", Math.floor(hours)).replace("%2", Math.floor(minutes));
         let days = hours / 24;
-        hours = hours % 24;
+        hours %= 24;
         if (days < 365)
-            return "QBT_TR(%1d %2h)QBT_TR[CONTEXT=misc]".replace("%1", parseInt(days)).replace("%2", parseInt(hours));
+            return "QBT_TR(%1d %2h)QBT_TR[CONTEXT=misc]".replace("%1", Math.floor(days)).replace("%2", Math.floor(hours));
         const years = days / 365;
-        days = days % 365;
-        return "QBT_TR(%1y %2d)QBT_TR[CONTEXT=misc]".replace("%1", parseInt(years)).replace("%2", parseInt(days));
+        days %= 365;
+        return "QBT_TR(%1y %2d)QBT_TR[CONTEXT=misc]".replace("%1", Math.floor(years)).replace("%2", Math.floor(days));
     };
 
     const friendlyPercentage = function(value) {
@@ -143,7 +143,7 @@ window.qBittorrent.Misc = (function() {
      * JS counterpart of the function in src/misc.cpp
      */
     const parseHtmlLinks = function(text) {
-        const exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#/%?=~_|!:,.;]*[-A-Z0-9+&@#/%=~_|])/ig;
+        const exp = /(\b(https?|ftp|file):\/\/[-\w+&@#/%?=~|!:,.;]*[-\w+&@#/%=~|])/gi;
         return text.replace(exp, "<a target='_blank' rel='noopener noreferrer' href='$1'>$1</a>");
     };
 
@@ -152,7 +152,7 @@ window.qBittorrent.Misc = (function() {
             valid: false
         };
 
-        if (typeof versionString !== 'string')
+        if (typeof versionString !== "string")
             return failure;
 
         const tryToNumber = (str) => {
@@ -160,7 +160,7 @@ window.qBittorrent.Misc = (function() {
             return (isNaN(num) ? str : num);
         };
 
-        const ver = versionString.split('.', 4).map(val => tryToNumber(val));
+        const ver = versionString.split(".", 4).map(val => tryToNumber(val));
         return {
             valid: true,
             major: ver[0],
@@ -171,7 +171,7 @@ window.qBittorrent.Misc = (function() {
     };
 
     const escapeHtml = function(str) {
-        const div = document.createElement('div');
+        const div = document.createElement("div");
         div.appendChild(document.createTextNode(str));
         const escapedString = div.innerHTML;
         div.remove();
@@ -179,7 +179,7 @@ window.qBittorrent.Misc = (function() {
     };
 
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Collator/Collator#parameters
-    const naturalSortCollator = new Intl.Collator(undefined, { numeric: true, usage: 'sort' });
+    const naturalSortCollator = new Intl.Collator(undefined, { numeric: true, usage: "sort" });
 
     const safeTrim = function(value) {
         try {
@@ -206,9 +206,9 @@ window.qBittorrent.Misc = (function() {
      */
     const containsAllTerms = function(text, terms) {
         const textToSearch = text.toLowerCase();
-        return terms.every(function(term) {
-            const isTermRequired = (term[0] === '+');
-            const isTermExcluded = (term[0] === '-');
+        return terms.every((term) => {
+            const isTermRequired = (term[0] === "+");
+            const isTermExcluded = (term[0] === "-");
             if (isTermRequired || isTermExcluded) {
                 // ignore lonely +/-
                 if (term.length === 1)

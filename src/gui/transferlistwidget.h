@@ -68,13 +68,13 @@ public slots:
     void removeSelectionTag(const Tag &tag);
     void clearSelectionTags();
     void setSelectedTorrentsLocation();
-    void pauseAllTorrents();
-    void resumeAllTorrents();
+    void pauseSession();
+    void resumeSession();
     void startSelectedTorrents();
     void forceStartSelectedTorrents();
     void startVisibleTorrents();
-    void pauseSelectedTorrents();
-    void pauseVisibleTorrents();
+    void stopSelectedTorrents();
+    void stopVisibleTorrents();
     void softDeleteSelectedTorrents();
     void permDeleteSelectedTorrents();
     void deleteSelectedTorrents(bool deleteLocalFiles);
@@ -95,7 +95,7 @@ public slots:
     void previewSelectedTorrents();
     void hideQueuePosColumn(bool hide);
     void applyFilter(const QString &name, const TransferListModel::Column &type);
-    void applyStatusFilter(int f);
+    void applyStatusFilter(int filterIndex);
     void applyCategoryFilter(const QString &category);
     void applyTagFilter(const std::optional<Tag> &tag);
     void applyTrackerFilterAll();

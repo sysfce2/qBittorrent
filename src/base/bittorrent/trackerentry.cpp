@@ -1,5 +1,6 @@
 /*
  * Bittorrent Client using Qt and libtorrent.
+ * Copyright (C) 2024  Mike Tzou (Chocobo1)
  * Copyright (C) 2015-2023  Vladimir Golovnev <glassez@yandex.ru>
  *
  * This program is free software; you can redistribute it and/or
@@ -28,7 +29,9 @@
 
 #include "trackerentry.h"
 
+#include <QHash>
 #include <QList>
+#include <QStringView>
 
 QList<BitTorrent::TrackerEntry> BitTorrent::parseTrackerEntries(const QStringView str)
 {

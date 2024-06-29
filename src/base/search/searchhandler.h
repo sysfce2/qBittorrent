@@ -1,6 +1,6 @@
 /*
  * Bittorrent Client using Qt and libtorrent.
- * Copyright (C) 2015, 2018  Vladimir Golovnev <glassez@yandex.ru>
+ * Copyright (C) 2015-2024 Vladimir Golovnev <glassez@yandex.ru>
  * Copyright (C) 2006  Christophe Dumez <chris@qbittorrent.org>
  *
  * This program is free software; you can redistribute it and/or
@@ -30,6 +30,7 @@
 #pragma once
 
 #include <QByteArray>
+#include <QDateTime>
 #include <QList>
 #include <QObject>
 #include <QString>
@@ -45,8 +46,10 @@ struct SearchResult
     qlonglong fileSize = 0;
     qlonglong nbSeeders = 0;
     qlonglong nbLeechers = 0;
+    QString engineName;
     QString siteUrl;
     QString descrLink;
+    QDateTime pubDate;
 };
 
 class SearchPluginManager;

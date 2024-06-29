@@ -333,6 +333,8 @@
         <file>private/images/mascot.png</file>
         <file>private/images/name.svg</file>
         <file>private/images/object-locked.svg</file>
+        <file>private/images/pause-session.svg</file>
+        <file>private/images/paused.svg</file>
         <file>private/images/peers-add.svg</file>
         <file>private/images/peers-remove.svg</file>
         <file>private/images/queued.svg</file>
@@ -398,6 +400,7 @@
         <file>private/scripts/prop-trackers.js</file>
         <file>private/scripts/prop-webseeds.js</file>
         <file>private/scripts/rename-files.js</file>
+        <file>private/scripts/search.js</file>
         <file>private/scripts/speedslider.js</file>
         <file>private/setlocation.html</file>
         <file>private/shareratio.html</file>

@@ -39,9 +39,9 @@
 #include <QUrl>
 #include <QVBoxLayout>
 
-#include "base/algorithm.h"
 #include "base/bittorrent/session.h"
 #include "base/bittorrent/torrent.h"
+#include "base/bittorrent/trackerentrystatus.h"
 #include "base/global.h"
 #include "base/logger.h"
 #include "base/net/downloadmanager.h"
@@ -123,9 +123,9 @@ TransferListFiltersWidget::TransferListFiltersWidget(QWidget *parent, TransferLi
     m_categoryFilterWidget = new CategoryFilterWidget(this);
     connect(m_categoryFilterWidget, &CategoryFilterWidget::actionDeleteTorrentsTriggered
             , transferList, &TransferListWidget::deleteVisibleTorrents);
-    connect(m_categoryFilterWidget, &CategoryFilterWidget::actionPauseTorrentsTriggered
-            , transferList, &TransferListWidget::pauseVisibleTorrents);
-    connect(m_categoryFilterWidget, &CategoryFilterWidget::actionResumeTorrentsTriggered
+    connect(m_categoryFilterWidget, &CategoryFilterWidget::actionStopTorrentsTriggered
+            , transferList, &TransferListWidget::stopVisibleTorrents);
+    connect(m_categoryFilterWidget, &CategoryFilterWidget::actionStartTorrentsTriggered
             , transferList, &TransferListWidget::startVisibleTorrents);
     connect(m_categoryFilterWidget, &CategoryFilterWidget::categoryChanged
             , transferList, &TransferListWidget::applyCategoryFilter);
@@ -141,9 +141,9 @@ TransferListFiltersWidget::TransferListFiltersWidget(QWidget *parent, TransferLi
     m_tagFilterWidget = new TagFilterWidget(this);
     connect(m_tagFilterWidget, &TagFilterWidget::actionDeleteTorrentsTriggered
             , transferList, &TransferListWidget::deleteVisibleTorrents);
-    connect(m_tagFilterWidget, &TagFilterWidget::actionPauseTorrentsTriggered
-            , transferList, &TransferListWidget::pauseVisibleTorrents);
-    connect(m_tagFilterWidget, &TagFilterWidget::actionResumeTorrentsTriggered
+    connect(m_tagFilterWidget, &TagFilterWidget::actionStopTorrentsTriggered
+            , transferList, &TransferListWidget::stopVisibleTorrents);
+    connect(m_tagFilterWidget, &TagFilterWidget::actionStartTorrentsTriggered
             , transferList, &TransferListWidget::startVisibleTorrents);
     connect(m_tagFilterWidget, &TagFilterWidget::tagChanged
             , transferList, &TransferListWidget::applyTagFilter);
@@ -191,10 +191,10 @@ void TransferListFiltersWidget::refreshTrackers(const BitTorrent::Torrent *torre
     m_trackersFilterWidget->refreshTrackers(torrent);
 }
 
-void TransferListFiltersWidget::trackerEntriesUpdated(const BitTorrent::Torrent *torrent
-        , const QHash<QString, BitTorrent::TrackerEntry> &updatedTrackerEntries)
+void TransferListFiltersWidget::trackerEntryStatusesUpdated(const BitTorrent::Torrent *torrent
+        , const QHash<QString, BitTorrent::TrackerEntryStatus> &updatedTrackers)
 {
-    m_trackersFilterWidget->handleTrackerEntriesUpdated(torrent, updatedTrackerEntries);
+    m_trackersFilterWidget->handleTrackerStatusesUpdated(torrent, updatedTrackers);
 }
 
 void TransferListFiltersWidget::onCategoryFilterStateChanged(bool enabled)

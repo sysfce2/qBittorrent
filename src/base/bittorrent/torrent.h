@@ -48,14 +48,17 @@ class QUrl;
 namespace BitTorrent
 {
     enum class DownloadPriority;
+
     class InfoHash;
     class PeerInfo;
     class Session;
     class TorrentID;
     class TorrentInfo;
+
     struct PeerAddress;
     struct SSLParameters;
     struct TrackerEntry;
+    struct TrackerEntryStatus;
 
     // Using `Q_ENUM_NS()` without a wrapper namespace in our case is not advised
     // since `Q_NAMESPACE` cannot be used when the same namespace resides at different files.
@@ -94,8 +97,8 @@ namespace BitTorrent
         CheckingUploading,
         CheckingDownloading,
 
-        PausedDownloading,
-        PausedUploading,
+        StoppedDownloading,
+        StoppedUploading,
 
         Moving,
 
@@ -225,10 +228,11 @@ namespace BitTorrent
         virtual void setShareLimitAction(ShareLimitAction action) = 0;
 
         virtual PathList filePaths() const = 0;
+        virtual PathList actualFilePaths() const = 0;
 
         virtual TorrentInfo info() const = 0;
         virtual bool isFinished() const = 0;
-        virtual bool isPaused() const = 0;
+        virtual bool isStopped() const = 0;
         virtual bool isQueued() const = 0;
         virtual bool isForced() const = 0;
         virtual bool isChecking() const = 0;
@@ -245,7 +249,7 @@ namespace BitTorrent
         virtual bool hasMissingFiles() const = 0;
         virtual bool hasError() const = 0;
         virtual int queuePosition() const = 0;
-        virtual QVector<TrackerEntry> trackers() const = 0;
+        virtual QVector<TrackerEntryStatus> trackers() const = 0;
         virtual QVector<QUrl> urlSeeds() const = 0;
         virtual QString error() const = 0;
         virtual qlonglong totalDownload() const = 0;
@@ -279,6 +283,7 @@ namespace BitTorrent
         virtual int maxSeedingTime() const = 0;
         virtual int maxInactiveSeedingTime() const = 0;
         virtual qreal realRatio() const = 0;
+        virtual qreal popularity() const = 0;
         virtual int uploadPayloadRate() const = 0;
         virtual int downloadPayloadRate() const = 0;
         virtual qlonglong totalPayloadUpload() const = 0;
@@ -290,8 +295,8 @@ namespace BitTorrent
         virtual void setName(const QString &name) = 0;
         virtual void setSequentialDownload(bool enable) = 0;
         virtual void setFirstLastPiecePriority(bool enabled) = 0;
-        virtual void pause() = 0;
-        virtual void resume(TorrentOperatingMode mode = TorrentOperatingMode::AutoManaged) = 0;
+        virtual void stop() = 0;
+        virtual void start(TorrentOperatingMode mode = TorrentOperatingMode::AutoManaged) = 0;
         virtual void forceReannounce(int index = -1) = 0;
         virtual void forceDHTAnnounce() = 0;
         virtual void forceRecheck() = 0;
@@ -325,7 +330,7 @@ namespace BitTorrent
         virtual void fetchDownloadingPieces(std::function<void (QBitArray)> resultHandler) const = 0;
 
         TorrentID id() const;
-        bool isResumed() const;
+        bool isRunning() const;
         qlonglong remainingSize() const;
 
         void toggleSequentialDownload();

@@ -55,7 +55,7 @@
 #include "torrent.h"
 #include "torrentcontentlayout.h"
 #include "torrentinfo.h"
-#include "trackerentry.h"
+#include "trackerentrystatus.h"
 
 namespace BitTorrent
 {
@@ -153,11 +153,12 @@ namespace BitTorrent
         Path actualFilePath(int index) const override;
         qlonglong fileSize(int index) const override;
         PathList filePaths() const override;
+        PathList actualFilePaths() const override;
         QVector<DownloadPriority> filePriorities() const override;
 
         TorrentInfo info() const override;
         bool isFinished() const override;
-        bool isPaused() const override;
+        bool isStopped() const override;
         bool isQueued() const override;
         bool isForced() const override;
         bool isChecking() const override;
@@ -175,7 +176,7 @@ namespace BitTorrent
         bool hasMissingFiles() const override;
         bool hasError() const override;
         int queuePosition() const override;
-        QVector<TrackerEntry> trackers() const override;
+        QVector<TrackerEntryStatus> trackers() const override;
         QVector<QUrl> urlSeeds() const override;
         QString error() const override;
         qlonglong totalDownload() const override;
@@ -210,6 +211,7 @@ namespace BitTorrent
         int maxSeedingTime() const override;
         int maxInactiveSeedingTime() const override;
         qreal realRatio() const override;
+        qreal popularity() const override;
         int uploadPayloadRate() const override;
         int downloadPayloadRate() const override;
         qlonglong totalPayloadUpload() const override;
@@ -222,8 +224,8 @@ namespace BitTorrent
         void setName(const QString &name) override;
         void setSequentialDownload(bool enable) override;
         void setFirstLastPiecePriority(bool enabled) override;
-        void pause() override;
-        void resume(TorrentOperatingMode mode = TorrentOperatingMode::AutoManaged) override;
+        void stop() override;
+        void start(TorrentOperatingMode mode = TorrentOperatingMode::AutoManaged) override;
         void forceReannounce(int index = -1) override;
         void forceDHTAnnounce() override;
         void forceRecheck() override;
@@ -268,6 +270,7 @@ namespace BitTorrent
 
         void handleAlert(const lt::alert *a);
         void handleStateUpdate(const lt::torrent_status &nativeStatus);
+        void handleQueueingModeChanged();
         void handleCategoryOptionsChanged();
         void handleAppendExtensionToggled();
         void handleUnwantedFolderToggled();
@@ -275,8 +278,8 @@ namespace BitTorrent
         void deferredRequestResumeData();
         void handleMoveStorageJobFinished(const Path &path, MoveStorageContext context, bool hasOutstandingJob);
         void fileSearchFinished(const Path &savePath, const PathList &fileNames);
-        TrackerEntry updateTrackerEntry(const lt::announce_entry &announceEntry, const QHash<lt::tcp::endpoint, QMap<int, int>> &updateInfo);
-        void resetTrackerEntries();
+        TrackerEntryStatus updateTrackerEntryStatus(const lt::announce_entry &announceEntry, const QHash<lt::tcp::endpoint, QMap<int, int>> &updateInfo);
+        void resetTrackerEntryStatuses();
 
     private:
         using EventTrigger = std::function<void ()>;
@@ -349,7 +352,7 @@ namespace BitTorrent
 
         MaintenanceJob m_maintenanceJob = MaintenanceJob::None;
 
-        QVector<TrackerEntry> m_trackerEntries;
+        QVector<TrackerEntryStatus> m_trackerEntryStatuses;
         QVector<QUrl> m_urlSeeds;
         FileErrorInfo m_lastFileError;
 

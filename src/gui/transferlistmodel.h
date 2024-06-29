@@ -62,6 +62,7 @@ public:
         TR_UPSPEED,
         TR_ETA,
         TR_RATIO,
+        TR_POPULARITY,
         TR_CATEGORY,
         TR_TAGS,
         TR_ADD_DATE,
@@ -128,7 +129,7 @@ private:
     enum class HideZeroValuesMode
     {
         Never,
-        Paused,
+        Stopped,
         Always
     };
 
@@ -140,7 +141,7 @@ private:
     QIcon m_downloadingIcon;
     QIcon m_errorIcon;
     QIcon m_movingIcon;
-    QIcon m_pausedIcon;
+    QIcon m_stoppedIcon;
     QIcon m_queuedIcon;
     QIcon m_stalledDLIcon;
     QIcon m_stalledUPIcon;

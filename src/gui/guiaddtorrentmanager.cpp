@@ -64,7 +64,8 @@ namespace
             delta.setY(0);
         dialogGeometry.translate(delta);
 
-        delta = screenGeometry.topLeft() - dialogGeometry.topLeft();
+        const QPoint frameOffset {10, 40};
+        delta = screenGeometry.topLeft() - dialogGeometry.topLeft() + frameOffset;
         if (delta.x() < 0)
             delta.setX(0);
         if (delta.y() < 0)
@@ -225,13 +226,15 @@ bool GUIAddTorrentManager::processTorrent(const QString &source, const BitTorren
 
     dlg->setAttribute(Qt::WA_DeleteOnClose);
     m_dialogs[infoHash] = dlg;
-    connect(dlg, &QDialog::finished, this, [this, source, infoHash, dlg](int result)
+    connect(dlg, &AddNewTorrentDialog::torrentAccepted, this
+            , [this, source](const BitTorrent::TorrentDescriptor &torrentDescr, const BitTorrent::AddTorrentParams &addTorrentParams)
+    {
+        addTorrentToSession(source, torrentDescr, addTorrentParams);
+    });
+    connect(dlg, &QDialog::finished, this, [this, source, infoHash, dlg]
     {
         if (dlg->isDoNotDeleteTorrentChecked())
             releaseTorrentFileGuard(source);
-
-        if (result == QDialog::Accepted)
-            addTorrentToSession(source, dlg->torrentDescriptor(), dlg->addTorrentParams());
 
         m_dialogs.remove(infoHash);
     });

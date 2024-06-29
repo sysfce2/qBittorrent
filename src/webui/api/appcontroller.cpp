@@ -36,6 +36,8 @@
 
 #include <QCoreApplication>
 #include <QDebug>
+#include <QDir>
+#include <QDirIterator>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -62,6 +64,7 @@
 #include "base/utils/password.h"
 #include "base/utils/string.h"
 #include "base/version.h"
+#include "apierror.h"
 #include "../webapplication.h"
 
 using namespace std::chrono_literals;
@@ -133,13 +136,13 @@ void AppController::preferencesAction()
     data[u"file_log_age"_s] = app()->fileLoggerAge();
     data[u"file_log_age_type"_s] = app()->fileLoggerAgeType();
     // Delete torrent contents files on torrent removal
-    data[u"delete_torrent_content_files"_s] = pref->deleteTorrentFilesAsDefault();
+    data[u"delete_torrent_content_files"_s] = pref->removeTorrentContent();
 
     // Downloads
     // When adding a torrent
     data[u"torrent_content_layout"_s] = Utils::String::fromEnum(session->torrentContentLayout());
     data[u"add_to_top_of_queue"_s] = session->isAddTorrentToQueueTop();
-    data[u"start_paused_enabled"_s] = session->isAddTorrentPaused();
+    data[u"add_stopped_enabled"_s] = session->isAddTorrentStopped();
     data[u"torrent_stop_condition"_s] = Utils::String::fromEnum(session->torrentStopCondition());
     data[u"merge_trackers"_s] = session->isMergeTrackersEnabled();
     data[u"auto_delete_mode"_s] = static_cast<int>(TorrentFileGuard::autoDeleteMode());
@@ -347,6 +350,8 @@ void AppController::preferencesAction()
     // qBitorrent preferences
     // Resume data storage type
     data[u"resume_data_storage_type"_s] = Utils::String::fromEnum(session->resumeDataStorageType());
+    // Torrent content removing mode
+    data[u"torrent_content_remove_option"_s] = Utils::String::fromEnum(session->torrentContentRemoveOption());
     // Physical memory (RAM) usage limit
     data[u"memory_working_set_limit"_s] = app()->memoryWorkingSetLimit();
     // Current network interface
@@ -516,7 +521,7 @@ void AppController::setPreferencesAction()
         app()->setFileLoggerAgeType(it.value().toInt());
     // Delete torrent content files on torrent removal
     if (hasKey(u"delete_torrent_content_files"_s))
-        pref->setDeleteTorrentFilesAsDefault(it.value().toBool());
+        pref->setRemoveTorrentContent(it.value().toBool());
 
     // Downloads
     // When adding a torrent
@@ -524,8 +529,8 @@ void AppController::setPreferencesAction()
         session->setTorrentContentLayout(Utils::String::toEnum(it.value().toString(), BitTorrent::TorrentContentLayout::Original));
     if (hasKey(u"add_to_top_of_queue"_s))
         session->setAddTorrentToQueueTop(it.value().toBool());
-    if (hasKey(u"start_paused_enabled"_s))
-        session->setAddTorrentPaused(it.value().toBool());
+    if (hasKey(u"add_stopped_enabled"_s))
+        session->setAddTorrentStopped(it.value().toBool());
     if (hasKey(u"torrent_stop_condition"_s))
         session->setTorrentStopCondition(Utils::String::toEnum(it.value().toString(), BitTorrent::Torrent::StopCondition::None));
     if (hasKey(u"merge_trackers"_s))
@@ -928,6 +933,9 @@ void AppController::setPreferencesAction()
     // Resume data storage type
     if (hasKey(u"resume_data_storage_type"_s))
         session->setResumeDataStorageType(Utils::String::toEnum(it.value().toString(), BitTorrent::ResumeDataStorageType::Legacy));
+    // Torrent content removing mode
+    if (hasKey(u"torrent_content_remove_option"_s))
+        session->setTorrentContentRemoveOption(Utils::String::toEnum(it.value().toString(), BitTorrent::TorrentContentRemoveOption::MoveToTrash));
     // Physical memory (RAM) usage limit
     if (hasKey(u"memory_working_set_limit"_s))
         app()->setMemoryWorkingSetLimit(it.value().toInt());
@@ -1127,6 +1135,41 @@ void AppController::defaultSavePathAction()
 void AppController::sendTestEmailAction()
 {
     app()->sendTestEmail();
+}
+
+
+void AppController::getDirectoryContentAction()
+{
+    requireParams({u"dirPath"_s});
+
+    const QString dirPath = params().value(u"dirPath"_s);
+    if (dirPath.isEmpty() || dirPath.startsWith(u':'))
+        throw APIError(APIErrorType::BadParams, tr("Invalid directory path"));
+
+    const QDir dir {dirPath};
+    if (!dir.isAbsolute())
+        throw APIError(APIErrorType::BadParams, tr("Invalid directory path"));
+    if (!dir.exists())
+        throw APIError(APIErrorType::NotFound, tr("Directory does not exist"));
+
+    const QString visibility = params().value(u"mode"_s, u"all"_s);
+
+    const auto parseDirectoryContentMode = [](const QString &visibility) -> QDir::Filters
+    {
+        if (visibility == u"dirs")
+            return QDir::Dirs;
+        if (visibility == u"files")
+            return QDir::Files;
+        if (visibility == u"all")
+            return (QDir::Dirs | QDir::Files);
+        throw APIError(APIErrorType::BadParams, tr("Invalid mode, allowed values: %1").arg(u"all, dirs, files"_s));
+    };
+
+    QJsonArray ret;
+    QDirIterator it {dirPath, (QDir::NoDotAndDotDot | parseDirectoryContentMode(visibility))};
+    while (it.hasNext())
+        ret.append(it.next());
+    setResult(ret);
 }
 
 void AppController::networkInterfaceListAction()

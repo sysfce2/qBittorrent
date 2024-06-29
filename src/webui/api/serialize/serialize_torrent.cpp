@@ -33,7 +33,7 @@
 
 #include "base/bittorrent/infohash.h"
 #include "base/bittorrent/torrent.h"
-#include "base/bittorrent/trackerentry.h"
+#include "base/bittorrent/trackerentrystatus.h"
 #include "base/path.h"
 #include "base/tagset.h"
 #include "base/utils/datetime.h"
@@ -51,8 +51,8 @@ namespace
             return u"missingFiles"_s;
         case BitTorrent::TorrentState::Uploading:
             return u"uploading"_s;
-        case BitTorrent::TorrentState::PausedUploading:
-            return u"pausedUP"_s;
+        case BitTorrent::TorrentState::StoppedUploading:
+            return u"stoppedUP"_s;
         case BitTorrent::TorrentState::QueuedUploading:
             return u"queuedUP"_s;
         case BitTorrent::TorrentState::StalledUploading:
@@ -67,8 +67,8 @@ namespace
             return u"metaDL"_s;
         case BitTorrent::TorrentState::ForcedDownloadingMetadata:
             return u"forcedMetaDL"_s;
-        case BitTorrent::TorrentState::PausedDownloading:
-            return u"pausedDL"_s;
+        case BitTorrent::TorrentState::StoppedDownloading:
+            return u"stoppedDL"_s;
         case BitTorrent::TorrentState::QueuedDownloading:
             return u"queuedDL"_s;
         case BitTorrent::TorrentState::StalledDownloading:
@@ -152,6 +152,7 @@ QVariantMap serialize(const BitTorrent::Torrent &torrent)
         {KEY_TORRENT_MAX_INACTIVE_SEEDING_TIME, torrent.maxInactiveSeedingTime()},
         {KEY_TORRENT_RATIO, adjustRatio(torrent.realRatio())},
         {KEY_TORRENT_RATIO_LIMIT, torrent.ratioLimit()},
+        {KEY_TORRENT_POPULARITY, torrent.popularity()},
         {KEY_TORRENT_SEEDING_TIME_LIMIT, torrent.seedingTimeLimit()},
         {KEY_TORRENT_INACTIVE_SEEDING_TIME_LIMIT, torrent.inactiveSeedingTimeLimit()},
         {KEY_TORRENT_LAST_SEEN_COMPLETE_TIME, Utils::DateTime::toSecsSinceEpoch(torrent.lastSeenComplete())},
@@ -162,7 +163,7 @@ QVariantMap serialize(const BitTorrent::Torrent &torrent)
         {KEY_TORRENT_AVAILABILITY, torrent.distributedCopies()},
         {KEY_TORRENT_REANNOUNCE, torrent.nextAnnounce()},
         {KEY_TORRENT_COMMENT, torrent.comment()},
-
+        {KEY_TORRENT_PRIVATE, torrent.isPrivate()},
         {KEY_TORRENT_TOTAL_SIZE, torrent.totalSize()}
     };
 }

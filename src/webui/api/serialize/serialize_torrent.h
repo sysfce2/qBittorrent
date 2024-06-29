@@ -54,6 +54,7 @@ inline const QString KEY_TORRENT_NUM_COMPLETE = u"num_complete"_s;
 inline const QString KEY_TORRENT_LEECHS = u"num_leechs"_s;
 inline const QString KEY_TORRENT_NUM_INCOMPLETE = u"num_incomplete"_s;
 inline const QString KEY_TORRENT_RATIO = u"ratio"_s;
+inline const QString KEY_TORRENT_POPULARITY = u"popularity"_s;
 inline const QString KEY_TORRENT_ETA = u"eta"_s;
 inline const QString KEY_TORRENT_STATE = u"state"_s;
 inline const QString KEY_TORRENT_SEQUENTIAL_DOWNLOAD = u"seq_dl"_s;
@@ -92,5 +93,6 @@ inline const QString KEY_TORRENT_SEEDING_TIME = u"seeding_time"_s;
 inline const QString KEY_TORRENT_AVAILABILITY = u"availability"_s;
 inline const QString KEY_TORRENT_REANNOUNCE = u"reannounce"_s;
 inline const QString KEY_TORRENT_COMMENT = u"comment"_s;
+inline const QString KEY_TORRENT_PRIVATE = u"private"_s;
 
 QVariantMap serialize(const BitTorrent::Torrent &torrent);

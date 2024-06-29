@@ -1,6 +1,6 @@
 /*
  * Bittorrent Client using Qt and libtorrent.
- * Copyright (C) 2015  Vladimir Golovnev <glassez@yandex.ru>
+ * Copyright (C) 2015-2024  Vladimir Golovnev <glassez@yandex.ru>
  * Copyright (C) 2006  Christophe Dumez
  *
  * This program is free software; you can redistribute it and/or
@@ -140,8 +140,8 @@ namespace
         if (!addTorrentParams.savePath.isEmpty())
             result.append(u"@savePath=" + addTorrentParams.savePath.data());
 
-        if (addTorrentParams.addPaused.has_value())
-            result.append(*addTorrentParams.addPaused ? u"@addPaused=1"_s : u"@addPaused=0"_s);
+        if (addTorrentParams.addStopped.has_value())
+            result.append(*addTorrentParams.addStopped ? u"@addStopped=1"_s : u"@addStopped=0"_s);
 
         if (addTorrentParams.skipChecking)
             result.append(u"@skipChecking"_s);
@@ -180,9 +180,9 @@ namespace
                 continue;
             }
 
-            if (param.startsWith(u"@addPaused="))
+            if (param.startsWith(u"@addStopped="))
             {
-                addTorrentParams.addPaused = (QStringView(param).mid(11).toInt() != 0);
+                addTorrentParams.addStopped = (QStringView(param).mid(11).toInt() != 0);
                 continue;
             }
 
@@ -251,6 +251,7 @@ Application::Application(int &argc, char **argv)
 #if !defined(DISABLE_GUI)
     setDesktopFileName(u"org.qbittorrent.qBittorrent"_s);
     setQuitOnLastWindowClosed(false);
+    setQuitLockEnabled(false);
     QPixmapCache::setCacheLimit(PIXMAP_CACHE_SIZE);
 #endif
 
@@ -832,7 +833,7 @@ int Application::exec()
     m_desktopIntegration = new DesktopIntegration;
     m_desktopIntegration->setToolTip(tr("Loading torrents..."));
 #ifndef Q_OS_MACOS
-    auto *desktopIntegrationMenu = new QMenu;
+    auto *desktopIntegrationMenu = m_desktopIntegration->menu();
     auto *actionExit = new QAction(tr("E&xit"), desktopIntegrationMenu);
     actionExit->setIcon(UIThemeManager::instance()->getIcon(u"application-exit"_s));
     actionExit->setMenuRole(QAction::QuitRole);
@@ -842,8 +843,6 @@ int Application::exec()
         QApplication::exit();
     });
     desktopIntegrationMenu->addAction(actionExit);
-
-    m_desktopIntegration->setMenu(desktopIntegrationMenu);
 
     const bool isHidden = m_desktopIntegration->isActive() && (startUpWindowState() == WindowState::Hidden);
 #else
